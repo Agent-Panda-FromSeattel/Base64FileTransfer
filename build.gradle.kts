@@ -1,4 +1,6 @@
 plugins {
+    // 确保插件正确应用
+    kotlin("jvm") version "1.8.22" apply false
     java
     application
 }
@@ -12,18 +14,37 @@ java {
 }
 
 application {
-    mainClass.set("cn.njit.Main") // 后续创建主类
+    mainClass.set("cn.njit.Main")
 }
 
-// 依赖配置
+// 添加多个仓库以增加可用性
+repositories {
+    mavenCentral()
+    maven { url = uri("https://repo.maven.apache.org/maven2") }
+    maven { url = uri("https://plugins.gradle.org/m2/") }
+}
+
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8") // Kotlin标准库
-    testImplementation("junit:junit:4.13.2") // 测试框架
+    // 显式指定Kotlin版本
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22")
+    testImplementation("junit:junit:4.13.2")
     // 后续如需SQLite，添加：implementation("org.xerial:sqlite-jdbc:3.42.0.0")
 }
 
-// 编译选项
+// 禁用配置缓存以避免缓存问题
+configurations.configureEach {
+    resolutionStrategy.cacheChangingModulesFor(0, "seconds")
+}
+
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
-    options.compilerArgs.add("--enable-preview") // JDK21预览特性
+    options.compilerArgs.add("--enable-preview")
+}
+
+// 清理任务
+tasks.register("cleanCache") {
+    doLast {
+        delete(rootProject.buildDir)
+        delete(file(".gradle"))
+    }
 }
