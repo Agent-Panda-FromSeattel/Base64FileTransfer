@@ -13,11 +13,11 @@ public class Server {
         try {
             serverSocket = new ServerSocket(PORT);
             running = true;
-            System.out.println("服务端启动，监听端口：" + PORT);
+            System.out.println("服务端启动, listening on port:" + PORT);
 
             while (running) {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("客户端连接：" + clientSocket.getInetAddress());
+                System.out.println("客户端连接:" + clientSocket.getInetAddress());
                 // 后续为每个客户端创建处理线程
                 new ClientHandler(clientSocket).start();
             }
