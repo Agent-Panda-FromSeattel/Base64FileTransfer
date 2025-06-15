@@ -51,11 +51,14 @@ public class Server {
         public void run() {
             try {
                 byte[] buffer = new byte[1024];
-                int length = clientSocket.getInputStream().read(buffer);
-                String encodedData = new String(buffer, 0, length);
-                String decodedData = Base64Util.decode(encodedData);
-                System.out.println("接收数据：" + decodedData);
-                // 后续处理数据
+                int length;
+                // 持续接收数据，直到客户端关闭连接
+                while ((length = clientSocket.getInputStream().read(buffer)) != -1) {
+                    String encodedData = new String(buffer, 0, length);
+                    String decodedData = Base64Util.decode(encodedData);
+                    System.out.println("接收数据：" + decodedData);
+                    // 后续处理数据
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {

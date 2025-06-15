@@ -28,7 +28,7 @@ dependencies {
     // 显式指定Kotlin版本
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22")
     testImplementation("junit:junit:4.13.2")
-    // 后续如需SQLite，添加：implementation("org.xerial:sqlite-jdbc:3.42.0.0")
+    implementation("org.xerial:sqlite-jdbc:3.42.0.0")
 }
 
 // 禁用配置缓存以避免缓存问题
