@@ -1,5 +1,7 @@
 package cn.njit.server;
 
+import cn.njit.base64.Base64Util;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -48,8 +50,12 @@ public class Server {
         @Override
         public void run() {
             try {
-                // 这里后续实现数据接收和处理
-                // ...
+                byte[] buffer = new byte[1024];
+                int length = clientSocket.getInputStream().read(buffer);
+                String encodedData = new String(buffer, 0, length);
+                String decodedData = Base64Util.decode(encodedData);
+                System.out.println("接收数据：" + decodedData);
+                // 后续处理数据
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
