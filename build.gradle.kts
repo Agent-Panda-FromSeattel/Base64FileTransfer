@@ -3,6 +3,7 @@ plugins {
     kotlin("jvm") version "1.8.22" apply false
     java
     application
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 group = "cn.njit"
@@ -47,4 +48,24 @@ tasks.register("cleanCache") {
         delete(rootProject.buildDir)
         delete(file(".gradle"))
     }
+}
+
+// 配置客户端任务
+tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("clientShadowJar") {
+    archiveClassifier.set("client")
+    manifest {
+        attributes("Main-Class" to "cn.njit.client.Client")
+    }
+    from(sourceSets.main.get().output)
+    configurations = listOf(project.configurations.runtimeClasspath.get())
+}
+
+// 配置服务器端任务
+tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("serverShadowJar") {
+    archiveClassifier.set("server")
+    manifest {
+        attributes("Main-Class" to "cn.njit.server.Server")
+    }
+    from(sourceSets.main.get().output)
+    configurations = listOf(project.configurations.runtimeClasspath.get())
 }
