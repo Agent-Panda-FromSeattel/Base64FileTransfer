@@ -20,8 +20,8 @@ public class Server {
             while (running) {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("客户端连接:" + clientSocket.getInetAddress());
-                // 后续为每个客户端创建处理线程
-                new ClientHandler(clientSocket).start();
+                // 为每个客户端创建一个新线程处理
+                new Thread(new ClientHandler(clientSocket)).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -49,18 +49,20 @@ public class Server {
 
         @Override
         public void run() {
-            try {
+            try (var in = clientSocket.getInputStream();
+                 var out = clientSocket.getOutputStream()) {
+
                 byte[] buffer = new byte[1024];
                 int length;
-                // 持续接收数据，直到客户端关闭连接
-                while ((length = clientSocket.getInputStream().read(buffer)) != -1) {
+
+                // 循环读取客户端数据（直到连接关闭）
+                while ((length = in.read(buffer)) != -1) {
                     String encodedData = new String(buffer, 0, length);
                     String decodedData = Base64Util.decode(encodedData);
                     System.out.println("接收数据：" + decodedData);
-                    // 后续处理数据
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (IOException e) {
+                System.out.println("客户端断开连接: " + clientSocket.getInetAddress());
             } finally {
                 try {
                     clientSocket.close();
