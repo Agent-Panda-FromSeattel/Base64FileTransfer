@@ -2,7 +2,6 @@ package cn.njit.client;
 
 import cn.njit.base64.Base64Util;
 
-
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
@@ -12,11 +11,20 @@ public class Client {
     private static final int SERVER_PORT = 8888;
     private Socket socket;
     private final Object outputLock = new Object(); // 用于同步输出流操作
+    private PrintWriter writer;
+    private BufferedReader reader;
 
     public boolean connect() {
         try {
             socket = new Socket(SERVER_HOST, SERVER_PORT);
+            writer = new PrintWriter(socket.getOutputStream(), true);
+            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             System.out.println("客户端连接到服务端：" + SERVER_HOST + ":" + SERVER_PORT);
+
+            // 读取服务端欢迎消息
+            String welcome = Base64Util.decode(reader.readLine());
+            System.out.println(welcome);
+
             return true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -50,15 +58,15 @@ public class Client {
         return exists;
     }
 
-    // 修改后的sendData方法
     public synchronized void sendData(String data) throws IOException {
         if (!isConnected()) {
             throw new IOException("连接未建立或已关闭");
         }
-        String encodedData = Base64Util.encode(data);
-        OutputStream out = socket.getOutputStream();
-        out.write(encodedData.getBytes());
-        out.flush();
+        writer.println(Base64Util.encode(data)); // 按行发送
+
+        // 读取服务端响应
+        String response = Base64Util.decode(reader.readLine());
+        System.out.println("服务器响应: " + response);
     }
 
     // 发送普通消息（自动添加MSG协议头）
@@ -74,11 +82,23 @@ public class Client {
                     System.err.println("错误：文件不存在或路径无效！");
                     return;
                 }
+
                 File file = new File(filePath);
                 String fileName = file.getName();
                 String encodedFile = Base64Util.encodeFile(filePath);
-                sendData("FILE:" + fileName + "|" + encodedFile);
+
+                // 分块发送
+                int chunkSize = 8192; // 8KB每块
+                writer.println(Base64Util.encode("FILE_START:" + fileName));
+
+                for (int i = 0; i < encodedFile.length(); i += chunkSize) {
+                    int end = Math.min(encodedFile.length(), i + chunkSize);
+                    writer.println(Base64Util.encode(encodedFile.substring(i, end)));
+                }
+
+                writer.println(Base64Util.encode("FILE_END"));
                 System.out.println("文件已发送: " + fileName);
+
             } catch (Exception e) {
                 System.err.println("文件传输失败: " + e.getMessage());
                 e.printStackTrace();
