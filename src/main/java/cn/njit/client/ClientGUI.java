@@ -79,6 +79,40 @@ public class ClientGUI extends JFrame {
         connect();
     }
 
+    public boolean connect() {
+        try {
+            socket = new Socket();
+            System.out.println("尝试连接到服务端：" + SERVER_HOST + ":" + SERVER_PORT);
+            // 设置连接超时5秒
+            socket.connect(new InetSocketAddress(SERVER_HOST, SERVER_PORT), 5000);
+            System.out.println("客户端成功连接到服务端：" + SERVER_HOST + ":" + SERVER_PORT);
+            // 设置读超时60秒
+            socket.setSoTimeout(60000);
+
+            writer = new PrintWriter(socket.getOutputStream(), true);
+            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+
+            // 首先读取服务端欢迎消息
+            System.out.println("开始读取服务端欢迎消息...");
+            String welcome = Base64Util.decode(reader.readLine());
+            messageArea.append(welcome + "\n");
+
+            // 然后检查版本
+            System.out.println("开始执行版本检查...");
+            checkVersion();
+
+            // 启动接收消息线程
+            new Thread(new MessageReceiver()).start();
+
+            return true;
+        } catch (IOException e) {
+            System.err.println("连接过程中出现异常：" + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     private void checkVersion() throws IOException {
         System.out.println("开始执行 checkVersion 方法");
         writer.println(Base64Util.encode("VERSION_CHECK"));
@@ -117,41 +151,6 @@ public class ClientGUI extends JFrame {
             }
         }
     }
-
-    public boolean connect() {
-        try {
-            socket = new Socket();
-            System.out.println("尝试连接到服务端：" + SERVER_HOST + ":" + SERVER_PORT);
-            // 设置连接超时5秒
-            socket.connect(new InetSocketAddress(SERVER_HOST, SERVER_PORT), 5000);
-            System.out.println("客户端成功连接到服务端：" + SERVER_HOST + ":" + SERVER_PORT);
-            // 设置读超时60秒
-            socket.setSoTimeout(60000);
-
-            writer = new PrintWriter(socket.getOutputStream(), true);
-            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-
-            // 首先读取服务端欢迎消息
-            System.out.println("开始读取服务端欢迎消息...");
-            String welcome = Base64Util.decode(reader.readLine());
-            messageArea.append(welcome + "\n");
-
-            // 然后检查版本
-            System.out.println("开始执行版本检查...");
-            checkVersion();
-
-            // 启动接收消息线程
-            new Thread(new MessageReceiver()).start();
-
-            return true;
-        } catch (IOException e) {
-            System.err.println("连接过程中出现异常：" + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
-    }
-
 
     // 添加执行更新脚本的方法
     private void executeUpdateScript() {

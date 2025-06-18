@@ -2,6 +2,7 @@ package cn.njit.server;
 
 import cn.njit.base64.Base64Util;
 import cn.njit.db.SQLiteDB;
+import cn.njit.util.CRC32Util;
 
 import javax.swing.*;
 import java.awt.*;
@@ -203,7 +204,12 @@ public class ServerGUI extends JFrame {
             try {
                 Path filePath = Paths.get(UPLOAD_DIR, fileName);
                 Base64Util.decodeFile(encodedFileData, filePath.toString());
-                logArea.append("文件保存成功: " + filePath + "\n");
+                // 然后计算保存后文件的校验和
+                long fileChecksum = CRC32Util.calculateFile(filePath.toString());
+
+
+                // 直接记录文件校验结果
+                logArea.append("文件保存成功: " + filePath + " (校验和: " + fileChecksum + ")\n");
 
                 long recordId = database.insertFile(fileName, "上传自客户端");
                 logArea.append("文件记录已存入数据库，ID: " + recordId + "\n");
@@ -219,6 +225,9 @@ public class ServerGUI extends JFrame {
                 Path filePath = Paths.get(UPGRADE_DIR, fileName);
                 if (Files.exists(filePath)) {
                     String encodedFile = Base64Util.encodeFile(filePath.toString());
+                    long checksum = CRC32Util.calculate(encodedFile);
+                    // Send checksum first
+                    writer.println(Base64Util.encode("CHECKSUM:" + checksum));
                     writer.println(Base64Util.encode("FILE_START:" + fileName));
 
                     int chunkSize = 8192;
@@ -228,7 +237,7 @@ public class ServerGUI extends JFrame {
                     }
 
                     writer.println(Base64Util.encode("FILE_END"));
-                    logArea.append("升级文件已发送: " + fileName + "\n");
+                    logArea.append("升级文件已发送: " + fileName + " (校验和: " + checksum + ")\n");
                 } else {
                     writer.println(Base64Util.encode("ERROR:文件不存在"));
                 }

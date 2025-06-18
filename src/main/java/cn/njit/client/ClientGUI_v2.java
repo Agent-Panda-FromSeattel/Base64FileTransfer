@@ -1,6 +1,7 @@
 package cn.njit.client;
 
 import cn.njit.base64.Base64Util;
+import cn.njit.util.CRC32Util;
 
 import javax.swing.*;
 import java.awt.*;
@@ -186,6 +187,7 @@ public class ClientGUI_v2 extends JFrame {
         try {
             String fileName = null;
             StringBuilder fileContent = new StringBuilder();
+            long expectedChecksum = 0;
 
             while (true) {
                 String encodedData = reader.readLine();
@@ -193,7 +195,9 @@ public class ClientGUI_v2 extends JFrame {
 
                 String decodedData = Base64Util.decode(encodedData);
 
-                if (decodedData.startsWith("FILE_START:")) {
+                if (decodedData.startsWith("CHECKSUM:")) {
+                    expectedChecksum = Long.parseLong(decodedData.substring(9));
+                } else if (decodedData.startsWith("FILE_START:")) {
                     fileName = decodedData.substring(11);
                     fileContent.setLength(0);
                 } else if (decodedData.equals("FILE_END")) {
@@ -201,9 +205,17 @@ public class ClientGUI_v2 extends JFrame {
                         // 保存文件为临时文件
                         Base64Util.decodeFile(fileContent.toString(), TEMP_CLIENT_JAR);
 
+                        // Verify the saved file
+                        long fileChecksum = CRC32Util.calculateFile(TEMP_CLIENT_JAR);
+                        if (fileChecksum != expectedChecksum) {
+                            messageArea.append("保存文件校验失败: 校验和不匹配 (预期: " + expectedChecksum +
+                                    ", 实际: " + fileChecksum + ")\n");
+                            new File(TEMP_CLIENT_JAR).delete();
+                            break;
+                        }
+
                         // 创建批处理文件用于替换旧版本
                         createUpdateScript();
-
                         messageArea.append("新版本已保存为: " + TEMP_CLIENT_JAR + "\n");
                         break;
                     }
@@ -280,6 +292,10 @@ public class ClientGUI_v2 extends JFrame {
         try {
             File file = new File(filePath);
             String fileName = file.getName();
+            long checksum = CRC32Util.calculateFile(filePath);
+            // 发送校验和
+            writer.println(Base64Util.encode("CHECKSUM:" + checksum));
+
             String encodedFile = Base64Util.encodeFile(filePath);
 
             // 分块发送
@@ -292,7 +308,7 @@ public class ClientGUI_v2 extends JFrame {
             }
 
             writer.println(Base64Util.encode("FILE_END"));
-            messageArea.append("文件已发送: " + fileName + "\n");
+            messageArea.append("文件已发送: " + fileName + " (校验和: " + checksum + ")\n");
 
         } catch (Exception e) {
             System.err.println("文件传输失败: " + e.getMessage());
