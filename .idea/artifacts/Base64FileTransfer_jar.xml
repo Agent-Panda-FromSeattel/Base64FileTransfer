@@ -1,0 +1,89 @@
+<component name="ArtifactManager">
+  <artifact build-on-make="true" name="Base64FileTransfer:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Base64FileTransfer_jar</output-path>
+    <root id="root">
+      <element id="archive" name="Base64FileTransfer.jar">
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+        </element>
+        <element id="module-output" name="Base64FileTransfer.main" />
+        <element id="module-test-output" name="Base64FileTransfer.test" />
+        <element id="dir-copy" path="$USER_HOME$/.gradle/caches/8.13/kotlin-dsl/accessors/45fa3cb6b4077a86ce0b8bff6eabdd7d/classes" />
+        <element id="dir-copy" path="$USER_HOME$/.gradle/caches/8.13/kotlin-dsl/accessors/edb3c948e8bf02f4334e03fb919622fc/classes" />
+        <element id="dir-copy" path="$USER_HOME$/.gradle/caches/8.13/kotlin-dsl/accessors/81f157934c94f845cf960452730ef331-PS/classes" />
+      </element>
+      <element id="library" level="project" name="groovy-ant-3.0.22.jar" />
+      <element id="library" level="project" name="asm-tree-9.2.jar" />
+      <element id="library" level="project" name="kotlin-gradle-plugin-api-1.8.22-gradle76.jar" />
+      <element id="library" level="project" name="kotlin-scripting-compiler-impl-embeddable-1.8.22.jar" />
+      <element id="library" level="project" name="gradle-core-api-8.13.jar" />
+      <element id="library" level="project" name="gradle-installation-beacon-8.13.jar" />
+      <element id="library" level="project" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22" />
+      <element id="library" level="project" name="jdom2-2.0.6.jar" />
+      <element id="library" level="project" name="asm-analysis-9.2.jar" />
+      <element id="library" level="project" name="kotlin-scripting-common-1.8.22.jar" />
+      <element id="library" level="project" name="gradle-api-8.13.jar" />
+      <element id="library" level="project" name="plexus-utils-3.4.1.jar" />
+      <element id="library" level="project" name="groovy-sql-3.0.22.jar" />
+      <element id="library" level="project" name="kotlin-annotation-processing-gradle-1.8.22.jar" />
+      <element id="library" level="project" name="kotlin-util-klib-1.8.22.jar" />
+      <element id="library" level="project" name="groovy-astbuilder-3.0.22.jar" />
+      <element id="library" level="project" name="groovy-groovydoc-3.0.22.jar" />
+      <element id="library" level="project" name="groovy-xml-3.0.22.jar" />
+      <element id="library" level="project" name="Gradle: junit:junit:4.13.2" />
+      <element id="library" level="project" name="kotlin-gradle-plugin-idea-proto-1.8.22.jar" />
+      <element id="library" level="project" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.8.22" />
+      <element id="library" level="project" name="gradle-core-8.13.jar" />
+      <element id="library" level="project" name="kotlin-daemon-client-1.8.22.jar" />
+      <element id="library" level="project" name="gradle-core-kotlin-extensions-8.13.jar" />
+      <element id="library" level="project" name="jdependency-2.7.0.jar" />
+      <element id="library" level="project" name="kotlin-project-model-1.8.22.jar" />
+      <element id="library" level="project" name="log4j-core-2.17.1.jar" />
+      <element id="library" level="project" name="commons-io-2.11.0.jar" />
+      <element id="library" level="project" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22" />
+      <element id="library" level="project" name="Gradle: org.jetbrains:annotations:13.0" />
+      <element id="library" level="project" name="groovy-3.0.22.jar" />
+      <element id="library" level="project" name="kotlin-util-io-1.8.22.jar" />
+      <element id="library" level="project" name="groovy-datetime-3.0.22.jar" />
+      <element id="library" level="project" name="kotlinx-coroutines-core-jvm-1.5.0.jar" />
+      <element id="library" level="project" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.8.22" />
+      <element id="library" level="project" name="Gradle: org.hamcrest:hamcrest-core:1.3" />
+      <element id="library" level="project" name="groovy-test-3.0.22.jar" />
+      <element id="library" level="project" name="kotlin-klib-commonizer-api-1.8.22.jar" />
+      <element id="library" level="project" name="groovy-dateutil-3.0.22.jar" />
+      <element id="library" level="project" name="jna-5.6.0.jar" />
+      <element id="library" level="project" name="Gradle: org.xerial:sqlite-jdbc:3.42.0.0" />
+      <element id="library" level="project" name="kotlin-scripting-jvm-1.8.22.jar" />
+      <element id="library" level="project" name="kotlin-gradle-plugin-idea-1.8.22.jar" />
+      <element id="library" level="project" name="trove4j-1.0.20200330.jar" />
+      <element id="library" level="project" name="kotlin-scripting-compiler-embeddable-1.8.22.jar" />
+      <element id="library" level="project" name="groovy-templates-3.0.22.jar" />
+      <element id="library" level="project" name="kotlin-gradle-plugin-1.8.22-gradle76.jar" />
+      <element id="library" level="project" name="kotlin-reflect-2.0.21.jar" />
+      <element id="library" level="project" name="gradle-kotlin-dsl-tooling-models-8.13.jar" />
+      <element id="library" level="project" name="kotlin-stdlib-2.0.21.jar" />
+      <element id="library" level="project" name="ant-1.10.11.jar" />
+      <element id="library" level="project" name="kotlin-native-utils-1.8.22.jar" />
+      <element id="library" level="project" name="ant-launcher-1.10.11.jar" />
+      <element id="library" level="project" name="gradle-kotlin-dsl-shared-runtime-8.13.jar" />
+      <element id="library" level="project" name="asm-commons-9.2.jar" />
+      <element id="library" level="project" name="shadow-7.1.2.jar" />
+      <element id="library" level="project" name="kotlin-tooling-core-1.8.22.jar" />
+      <element id="library" level="project" name="kotlin-android-extensions-1.8.22.jar" />
+      <element id="library" level="project" name="kotlin-gradle-plugin-model-1.8.22.jar" />
+      <element id="library" level="project" name="asm-9.2.jar" />
+      <element id="library" level="project" name="groovy-json-3.0.22.jar" />
+      <element id="library" level="project" name="groovy-console-3.0.22.jar" />
+      <element id="library" level="project" name="groovy-nio-3.0.22.jar" />
+      <element id="library" level="project" name="gradle-kotlin-dsl-8.13.jar" />
+      <element id="library" level="project" name="javaparser-core-3.17.0.jar" />
+      <element id="library" level="project" name="kotlin-daemon-embeddable-1.8.22.jar" />
+      <element id="library" level="project" name="kotlin-compiler-embeddable-1.8.22.jar" />
+      <element id="library" level="project" name="kotlin-compiler-runner-1.8.22.jar" />
+      <element id="library" level="project" name="gradle-kotlin-dsl-extensions-8.13.jar" />
+      <element id="library" level="project" name="kotlin-gradle-plugin-api-1.8.22.jar" />
+      <element id="library" level="project" name="kotlin-gradle-plugin-annotations-1.8.22.jar" />
+      <element id="library" level="project" name="log4j-api-2.17.1.jar" />
+    </root>
+  </artifact>
+</component>

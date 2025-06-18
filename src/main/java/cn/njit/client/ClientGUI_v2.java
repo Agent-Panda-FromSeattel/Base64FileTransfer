@@ -16,7 +16,7 @@ import java.nio.file.StandardCopyOption;
 public class ClientGUI_v2 extends JFrame {
     private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 8888;
-    private static final String CLIENT_VERSION = "1.0.0";
+    private static final String CLIENT_VERSION = "1.0.1";
     private static final String CLIENT_JAR = "ClientGUI.jar";
     private static final String TEMP_CLIENT_JAR = "ClientGUI.temp.jar";
     private Socket socket;
@@ -29,7 +29,7 @@ public class ClientGUI_v2 extends JFrame {
     private JButton fileButton;
 
     public ClientGUI_v2() {
-        setTitle("客户端");
+        setTitle("客户端（新版本 v" + CLIENT_VERSION + "）"); // 标题注明新版本
         setSize(400, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -48,6 +48,15 @@ public class ClientGUI_v2 extends JFrame {
         inputPanel.add(sendButton, BorderLayout.EAST);
         inputPanel.add(fileButton, BorderLayout.WEST);
         add(inputPanel, BorderLayout.SOUTH);
+        // 添加新功能提示
+        JButton newFeatureButton = new JButton("点击查看新功能");
+        newFeatureButton.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this,
+                    "这是新版本 v" + CLIENT_VERSION + " 新增的功能！\n" +
+                            "1. 支持自动更新\n" +
+                            "2. 优化了文件传输速度");
+        });
+        add(newFeatureButton, BorderLayout.NORTH);
 
         sendButton.addActionListener(new ActionListener() {
             @Override
