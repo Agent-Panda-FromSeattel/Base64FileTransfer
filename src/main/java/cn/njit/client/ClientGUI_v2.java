@@ -2,6 +2,7 @@ package cn.njit.client;
 
 import cn.njit.base64.Base64Util;
 import cn.njit.util.CRC32Util;
+import cn.njit.steganography.LSBSteganography;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,6 +14,8 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 
 public class ClientGUI_v2 extends JFrame {
     private static final String SERVER_HOST = "localhost";
@@ -54,8 +57,8 @@ public class ClientGUI_v2 extends JFrame {
         newFeatureButton.addActionListener(e -> {
             JOptionPane.showMessageDialog(this,
                     "这是新版本 v" + CLIENT_VERSION + " 新增的功能！\n" +
-                            "1. 支持自动更新\n" +
-                            "2. 优化了文件传输速度");
+                            "1. 数据传输添加了CRC32校验\n" +
+                            "2. 上传bmp文件时会使用LSB隐写技术把文字信息隐藏进图像文件");
         });
         add(newFeatureButton, BorderLayout.NORTH);
 
@@ -83,10 +86,37 @@ public class ClientGUI_v2 extends JFrame {
                     File selectedFile = fileChooser.getSelectedFile();
                     sendFile(selectedFile.getAbsolutePath());
                 }
+                // After sending, check if we received any files recently
+                File downloadsDir = new File(System.getProperty("user.dir"));
+                File[] downloadedFiles = downloadsDir.listFiles((dir, name) ->
+                        name.toLowerCase().endsWith(".bmp"));
+
+                if (downloadedFiles != null) {
+                    for (File file : downloadedFiles) {
+                        checkForSteganography(file);
+                    }
+                }
             }
         });
 
         connect();
+    }
+    private void checkForSteganography(File file) {
+        try {
+            if (file.getName().toLowerCase().endsWith(".bmp")) {
+                BufferedImage image = ImageIO.read(file);
+
+                try {
+                    // Try to extract hidden message (with random position flag matching server)
+                    String hiddenMessage = LSBSteganography.extractTextFromImage(image, true,12345);
+                    messageArea.append("发现隐写信息: " + hiddenMessage + "\n");
+                } catch (IllegalArgumentException e) {
+                    messageArea.append("未检测到隐写信息: " + e.getMessage() + "\n");
+                }
+            }
+        } catch (IOException e) {
+            messageArea.append("检查隐写信息时出错: " + e.getMessage() + "\n");
+        }
     }
     private void checkVersion() throws IOException {
         System.out.println("开始执行 checkVersion 方法");

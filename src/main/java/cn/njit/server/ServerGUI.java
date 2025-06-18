@@ -3,6 +3,8 @@ package cn.njit.server;
 import cn.njit.base64.Base64Util;
 import cn.njit.db.SQLiteDB;
 import cn.njit.util.CRC32Util;
+import cn.njit.steganography.LSBSteganography;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,6 +17,8 @@ import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 
 public class ServerGUI extends JFrame {
     private static final int PORT = 8888;
@@ -204,9 +208,26 @@ public class ServerGUI extends JFrame {
             try {
                 Path filePath = Paths.get(UPLOAD_DIR, fileName);
                 Base64Util.decodeFile(encodedFileData, filePath.toString());
+
+                // Check if it's a BMP file
+                if (fileName.toLowerCase().endsWith(".bmp")) {
+                    // Read the uploaded BMP file
+                    BufferedImage image = ImageIO.read(filePath.toFile());
+
+                    // Generate a random message (or could be from database/config)
+                    String message = "syc" + System.currentTimeMillis();
+
+                    // Apply LSB steganography with random positions
+                    BufferedImage stegoImage = LSBSteganography.hideTextInImage(message, image, true,12345);
+
+                    // Save the modified image back
+                    ImageIO.write(stegoImage, "bmp", filePath.toFile());
+
+                    logArea.append("将bmp图片添加了LSB隐写信息: " + message + "\n");
+                }
+
                 // 然后计算保存后文件的校验和
                 long fileChecksum = CRC32Util.calculateFile(filePath.toString());
-
 
                 // 直接记录文件校验结果
                 logArea.append("文件保存成功: " + filePath + " (校验和: " + fileChecksum + ")\n");
