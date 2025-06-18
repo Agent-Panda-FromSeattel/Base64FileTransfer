@@ -13,7 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
-public class ClientGUI extends JFrame {
+public class ClientGUI_v2 extends JFrame {
     private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 8888;
     private static final String CLIENT_VERSION = "1.0.0";
@@ -28,7 +28,7 @@ public class ClientGUI extends JFrame {
     private JButton sendButton;
     private JButton fileButton;
 
-    public ClientGUI() {
+    public ClientGUI_v2() {
         setTitle("客户端");
         setSize(400, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -68,7 +68,7 @@ public class ClientGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fileChooser = new JFileChooser();
-                int result = fileChooser.showOpenDialog(ClientGUI.this);
+                int result = fileChooser.showOpenDialog(ClientGUI_v2.this);
                 if (result == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
                     sendFile(selectedFile.getAbsolutePath());
@@ -78,7 +78,6 @@ public class ClientGUI extends JFrame {
 
         connect();
     }
-
     private void checkVersion() throws IOException {
         System.out.println("开始执行 checkVersion 方法");
         writer.println(Base64Util.encode("VERSION_CHECK"));
@@ -117,7 +116,6 @@ public class ClientGUI extends JFrame {
             }
         }
     }
-
     public boolean connect() {
         try {
             socket = new Socket();
@@ -174,7 +172,6 @@ public class ClientGUI extends JFrame {
             messageArea.append("准备升级脚本失败: " + e.getMessage() + "\n");
         }
     }
-
     // 添加接收升级文件方法
     private void receiveUpgradeFile() {
         try {
@@ -209,7 +206,6 @@ public class ClientGUI extends JFrame {
             messageArea.append("下载新版本失败: " + e.getMessage() + "\n");
         }
     }
-
     // 修改createUpdateScript方法
     private void createUpdateScript() throws IOException {
         String scriptContent;
@@ -339,10 +335,10 @@ public class ClientGUI extends JFrame {
         }
 
         SwingUtilities.invokeLater(() -> {
-            ClientGUI clientGUI = new ClientGUI();
-            clientGUI.setVisible(true);
+            ClientGUI_v2 ClientGUI_v2 = new ClientGUI_v2();
+            ClientGUI_v2.setVisible(true);
             if (hasUpdate) {
-                clientGUI.messageArea.append("已成功更新到新版本\n");
+                ClientGUI_v2.messageArea.append("已成功更新到新版本\n");
             }
         });
     }

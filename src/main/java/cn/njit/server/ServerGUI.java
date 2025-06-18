@@ -19,11 +19,14 @@ public class ServerGUI extends JFrame {
     private static final int PORT = 8888;
     private ServerSocket serverSocket;
     private volatile boolean running = false;
-    private static final String CURRENT_VERSION = "1.0.0";
-    private static boolean upgradeFlag = false;
+    private static final String CURRENT_VERSION = "1.0.1";
+    private static boolean upgradeFlag = true;
     private ExecutorService threadPool = Executors.newFixedThreadPool(10);
     private SQLiteDB database;
     private static final String UPLOAD_DIR = "uploads";
+    private static final String UPGRADE_DIR = "upgrades";
+    private static final String VERSION_CMD = "VERSION_CHECK";
+    private static final String UPGRADE_CMD = "UPGRADE_REQUEST";
 
     private JTextArea logArea;
 
@@ -43,6 +46,7 @@ public class ServerGUI extends JFrame {
 
         try {
             Files.createDirectories(Paths.get(UPLOAD_DIR));
+            Files.createDirectories(Paths.get(UPGRADE_DIR));
         } catch (IOException e) {
             System.err.println("无法创建上传目录: " + e.getMessage());
         }
@@ -115,9 +119,6 @@ public class ServerGUI extends JFrame {
             try (InputStream in = clientSocket.getInputStream();
                  OutputStream out = clientSocket.getOutputStream()) {
 
-                // 增加文件传输超时时间
-                clientSocket.setSoTimeout(120000); // 120秒超时
-
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                 PrintWriter writer = new PrintWriter(out, true);
 
@@ -164,6 +165,17 @@ public class ServerGUI extends JFrame {
                             // 文件内容块
                             fileContent.append(decodedData);
                             writer.println(Base64Util.encode("SERVER:文件块已接收"));
+                        } else if (VERSION_CMD.equals(decodedData)) {
+                            // 返回版本信息和升级标志
+                            String response = "VERSION_INFO:" + CURRENT_VERSION + ":" + upgradeFlag;
+                            writer.println(Base64Util.encode(response));
+                        } else if (decodedData.startsWith(UPGRADE_CMD)) {
+                            // 处理升级文件请求
+                            String requestedFile = decodedData.substring(UPGRADE_CMD.length() + 1);
+                            sendUpgradeFile(requestedFile, writer);
+                        } else if ("HEARTBEAT".equals(decodedData)) {
+                            // 心跳包，不做任何处理，保持连接
+                            continue;
                         } else {
                             writer.println(Base64Util.encode("SERVER:未知命令"));
                         }
@@ -199,6 +211,30 @@ public class ServerGUI extends JFrame {
             } catch (Exception e) {
                 logArea.append("处理文件上传失败: " + e.getMessage() + "\n");
                 e.printStackTrace();
+            }
+        }
+        // 添加发送升级文件的方法
+        private void sendUpgradeFile(String fileName, PrintWriter writer) {
+            try {
+                Path filePath = Paths.get(UPGRADE_DIR, fileName);
+                if (Files.exists(filePath)) {
+                    String encodedFile = Base64Util.encodeFile(filePath.toString());
+                    writer.println(Base64Util.encode("FILE_START:" + fileName));
+
+                    int chunkSize = 8192;
+                    for (int i = 0; i < encodedFile.length(); i += chunkSize) {
+                        int end = Math.min(encodedFile.length(), i + chunkSize);
+                        writer.println(Base64Util.encode(encodedFile.substring(i, end)));
+                    }
+
+                    writer.println(Base64Util.encode("FILE_END"));
+                    logArea.append("升级文件已发送: " + fileName + "\n");
+                } else {
+                    writer.println(Base64Util.encode("ERROR:文件不存在"));
+                }
+            } catch (Exception e) {
+                logArea.append("发送升级文件失败: " + e.getMessage() + "\n");
+                writer.println(Base64Util.encode("ERROR:发送失败"));
             }
         }
     }
