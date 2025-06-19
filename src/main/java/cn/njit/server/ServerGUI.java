@@ -14,6 +14,8 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -33,18 +35,43 @@ public class ServerGUI extends JFrame {
     private static final String VERSION_CMD = "VERSION_CHECK";
     private static final String UPGRADE_CMD = "UPGRADE_REQUEST";
 
+
     private JTextArea logArea;
+    private JTable dbTable;
+    private JScrollPane tableScrollPane;
+    private JTabbedPane tabbedPane; // 使用选项卡面板
 
     public ServerGUI() {
         setTitle("服务端");
-        setSize(400, 400);
+        setSize(800, 600); // 增大窗口尺寸
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
 
+        // 使用选项卡面板
+        tabbedPane = new JTabbedPane();
+        add(tabbedPane, BorderLayout.CENTER);
+
+        // 日志面板
+        JPanel logPanel = new JPanel(new BorderLayout());
         logArea = new JTextArea();
         logArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(logArea);
-        add(scrollPane, BorderLayout.CENTER);
+        JScrollPane logScrollPane = new JScrollPane(logArea);
+        logPanel.add(logScrollPane, BorderLayout.CENTER);
+
+        // 添加控制按钮
+        JPanel buttonPanel = new JPanel();
+        JButton viewDbButton = new JButton("刷新数据库");
+        viewDbButton.addActionListener(e -> viewDatabase());
+        buttonPanel.add(viewDbButton);
+        logPanel.add(buttonPanel, BorderLayout.NORTH);
+
+        tabbedPane.addTab("服务器日志", logPanel);
+
+        // 数据库面板
+        JPanel dbPanel = new JPanel(new BorderLayout());
+        dbTable = new JTable();
+        tableScrollPane = new JScrollPane(dbTable);
+        dbPanel.add(tableScrollPane, BorderLayout.CENTER);
+        tabbedPane.addTab("数据库记录", dbPanel);
 
         database = new SQLiteDB();
         database.connect();
@@ -53,11 +80,52 @@ public class ServerGUI extends JFrame {
             Files.createDirectories(Paths.get(UPLOAD_DIR));
             Files.createDirectories(Paths.get(UPGRADE_DIR));
         } catch (IOException e) {
-            System.err.println("无法创建上传目录: " + e.getMessage());
+            logArea.append("无法创建上传目录: " + e.getMessage() + "\n");
         }
 
         start();
     }
+
+    private void viewDatabase() {
+        try {
+            List<Map<String, Object>> fileRecords = database.getAllFileRecords();
+
+            if (fileRecords.isEmpty()) {
+                logArea.append("数据库中没有记录\n");
+                return;
+            }
+
+            // 创建表格模型
+            String[] columnNames = {"ID", "文件名", "描述", "上传时间"};
+            Object[][] data = new Object[fileRecords.size()][4];
+
+            for (int i = 0; i < fileRecords.size(); i++) {
+                Map<String, Object> record = fileRecords.get(i);
+                data[i][0] = record.get("id");
+                data[i][1] = record.get("filename");
+                data[i][2] = record.get("description");
+                data[i][3] = record.get("upload_time");
+            }
+
+            dbTable.setModel(new javax.swing.table.DefaultTableModel(
+                    data, columnNames
+            ) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false; // 使表格不可编辑
+                }
+            });
+
+            // 自动切换到数据库标签页
+            tabbedPane.setSelectedIndex(1);
+            logArea.append("已加载数据库记录: " + fileRecords.size() + " 条\n");
+
+        } catch (Exception e) {
+            logArea.append("获取数据库记录失败: " + e.getMessage() + "\n");
+            e.printStackTrace();
+        }
+    }
+
 
     public void start() {
         try {

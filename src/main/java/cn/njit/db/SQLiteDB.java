@@ -2,7 +2,9 @@ package cn.njit.db;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SQLiteDB {
     private Connection connection;
@@ -62,6 +64,8 @@ public class SQLiteDB {
         return id;
     }
 
+
+
     // 查询所有文件记录
     public List<FileRecord> queryAllFiles() {
         List<FileRecord> records = new ArrayList<>();
@@ -93,6 +97,25 @@ public class SQLiteDB {
             return "ID: " + id + ", 文件名: " + filename + ", 时间: " + uploadTime;
         }
     }
+
+    public List<Map<String, Object>> getAllFileRecords() throws SQLException {
+        List<Map<String, Object>> records = new ArrayList<>();
+        String sql = "SELECT id, filename, description, upload_time FROM files";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                Map<String, Object> record = new HashMap<>();
+                record.put("id", rs.getInt("id"));
+                record.put("filename", rs.getString("filename"));
+                record.put("description", rs.getString("description"));
+                record.put("upload_time", rs.getString("upload_time"));
+                records.add(record);
+            }
+        }
+        return records;
+    }
+
+
 
     // 测试方法
     public static void main(String[] args) {
